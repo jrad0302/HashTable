@@ -255,11 +255,11 @@ void* insertItem(HashTable* hashTable, unsigned int key, void* value) {
     // return NULL
     return NULL;
   // else if it returns the pointer of the node matching the key
-  } else {
+  } else if (node -> key == key) {
     // grab the value from the node
     void* v = node -> value;
     // replace the node with a new one
-    node = createHashTableEntry(key, value);
+    node -> value = value;
     // return the old value
     return v;
   }
@@ -269,7 +269,7 @@ void* getItem(HashTable* hashTable, unsigned int key) {
   // find the index using the hash function
   HashTableEntry* node = findItem(hashTable, key);
   // if the node exists
-  if (node != NULL) {
+  if (node) {
     // return the value
     return node -> value;
   }
@@ -278,26 +278,57 @@ void* getItem(HashTable* hashTable, unsigned int key) {
 }
 
 void* removeItem(HashTable* hashTable, unsigned int key) {
-  // retrieve the value from the node that matches the key
-  void* v = getItem(hashTable, key);
-  // if it does not exist
-  if(v == NULL) {
-    // return NULL
-    return NULL;
-  } else {
-    // return value otherwise
+  HashTableEntry* delete = findItem(hashTable, key);
+
+  // find the index
+  int index = hashTable -> hash(key);
+
+  // create pertinent variables
+  HashTableEntry* node = hashTable->buckets[index];
+
+  // special case for when the deleted is the head
+  if (node && node -> key == key) {
+    // grab the value from the old head
+    void* v = node -> value;
+
+    // move the head to the next
+    hashTable->buckets[index] = node -> next;
+    
+    // free everything
+    free(node);
+    // return value
     return v;
   }
+  // as long as the node is not NULL
+  while(node) {
+    // check for equivalency
+    if (node -> next) {
+      if (node -> next -> key != key) {
+      // if they're not equal, loop
+      node = node -> next;
+    }
+  }
+    
+
+  // if the node exists
+  if(delete) {
+    // grab delete's value
+    void* v = delete -> value;
+    // move the previous's pointer
+    node -> next = delete -> next;
+    // free it
+    free(delete);
+    return v;
+  }
+  // otherwise return NULL
+  return NULL;
 }
 
 void deleteItem(HashTable* hashTable, unsigned int key) {
-  // find the item matching the key
-  HashTableEntry* node = findItem(hashTable, key);
-  // if the node exists
-  if(node) {
-    // free it
-    free(node -> value);
-    free(node);
+  // grab that v value
+  void* v = removeItem(hashTable, key);
+  // delete it
+  free(v);
   }
-  // otherwise do nothing
 }
+

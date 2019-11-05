@@ -119,6 +119,68 @@ TEST(AccessTest, GetKey_KeyNotPresent)
 	destroyHashTable(ht);
 }
 
+TEST(AccessTest, GetTwoKeys) {
+	HashTable* ht = createHashTable(hash, BUCKET_NUM);
+
+	// Create a list of items to add to hash table.
+	size_t num_items = 2;
+	HTItem* m[num_items];
+	make_items(m, num_items);
+
+	// Insert one item into the hash table.
+	insertItem(ht, 0, m[0]);
+	// Insert second item into the hash table.
+	insertItem(ht, 1, m[1]);
+
+	// Ensure the first one is retrievable.
+	EXPECT_EQ(m[0], getItem(ht, 0));
+	// Ensure the second is too.
+	EXPECT_EQ(m[1], getItem(ht, 1));
+
+	// Destroy the hash table togeter with the inserted values
+	destroyHashTable(ht);
+}
+
+TEST(AccessTest, GetSecondKey) {
+	HashTable* ht = createHashTable(hash, BUCKET_NUM);
+
+	// Create a list of items to add to hash table.
+	size_t num_items = 2;
+	HTItem* m[num_items];
+	make_items(m, num_items);
+
+	// Insert one item into the hash table.
+	insertItem(ht, 0, m[0]);
+	// Insert second item into the hash table.
+	insertItem(ht, 5, m[1]);
+
+	// Grab the second item in the bucket
+	EXPECT_EQ(m[1], getItem(ht, 5));
+
+	// Destroy the hash table togeter with the inserted values
+	destroyHashTable(ht);
+}
+
+TEST(AccessTest, GetMultipleKeys) {
+	HashTable* ht = createHashTable(hash, BUCKET_NUM);
+
+	// Create a list of items to add to hash table
+	size_t num_items = 15;
+	HTItem* m[num_items];
+	make_items(m, num_items);
+
+	// Insert the items at the keys
+	for (int i = 0; i < 15; i++)
+	{
+		insertItem(ht, i, m[i]);
+	}
+
+	// Access all these items
+	for (int i = 0; i < 15; i++)
+	{
+		EXPECT_EQ(m[i], getItem(ht, i));
+	}
+}
 ////////////////////////////
 // Removal and delete tests
 ////////////////////////////
@@ -144,6 +206,67 @@ TEST(RemoveTest, SingleValidRemove)
 	EXPECT_EQ(m[0], data);
 
 	// Free the data
+	free(data);
+
+	destroyHashTable(ht);
+}
+
+ TEST(RemoveTest, RemoveSecondInBucket) {
+
+	HashTable* ht = createHashTable(hash, BUCKET_NUM);
+
+	// Create a list of items to add to hash table.
+	size_t num_items = 2;
+	HTItem* m[num_items];
+	make_items(m, num_items);
+
+	// Insert the items into the hash table.
+	insertItem(ht, 0, m[0]);
+	insertItem(ht, 5, m[1]);
+
+	// Remove the thing from the list.
+	void* data = removeItem(ht, 0);
+
+	// Make sure head remove worked
+	EXPECT_EQ(m[0], data);
+
+	data = removeItem(ht, 5);
+
+	// Check to see if we can access the second
+	EXPECT_EQ(m[1], data);
+
+	// Free and destroy
+	free(data);
+
+	destroyHashTable(ht);
+ }
+
+TEST(RemoveTest, RemoveThirdInBucket) {
+
+	HashTable* ht = createHashTable(hash, BUCKET_NUM);
+
+	// Create a list of items to add to hash table.
+	size_t num_items = 3;
+	HTItem* m[num_items];
+	make_items(m, num_items);
+
+	// Insert the items into the hash table.
+	insertItem(ht, 0, m[0]);
+	insertItem(ht, 5, m[1]);
+	insertItem(ht, 10, m[2]);
+
+	// Remove the thing from the list.
+	void* data = removeItem(ht, 5);
+
+	// Make sure head remove worked
+	EXPECT_EQ(m[1], data);
+
+	data = removeItem(ht, 10);
+
+	// Check to see if we can access the second
+	EXPECT_EQ(m[2], data);
+
+	// Free and destroy
 	free(data);
 
 	destroyHashTable(ht);
