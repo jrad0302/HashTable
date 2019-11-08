@@ -1,6 +1,6 @@
 /*
- Student Name:
- Date:
+ Student Name: Johnathan Radcliff
+ Date: 11/4/19
 
 =======================
 ECE 2035 Project 2-1:
